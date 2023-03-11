@@ -1,19 +1,23 @@
 package com.gustafah.android.littlecanary.watcher
 
 import android.text.Editable
-import android.text.InputFilter
+import com.gustafah.android.littlecanary.common.Masks.CHAR_MASK
+import com.gustafah.android.littlecanary.common.Masks.DIGIT_CHAR_MASK
+import com.gustafah.android.littlecanary.common.Masks.DIGIT_MASK
 import com.gustafah.android.littlecanary.common.Patterns
 import com.gustafah.android.littlecanary.validator.Validator
+import java.util.regex.Pattern
 
 abstract class MaskedTextWatcher : android.text.TextWatcher {
 
-    private val validMaskChars = listOf('#', 'L')
+    private val validMaskChars = listOf(DIGIT_MASK, CHAR_MASK, DIGIT_CHAR_MASK)
 
     private var isUpdating = false
     private var isDeleting = false
     private var isPasting = false
 
     protected var watcherMask: String = ""
+    protected var clearPattern: Pattern = Patterns.NOT_DIGIT
     abstract val watcherValidation: Validator
     abstract val validation: (Boolean) -> Unit
 
@@ -32,14 +36,14 @@ abstract class MaskedTextWatcher : android.text.TextWatcher {
         isUpdating = true
 
         val builder = StringBuilder()
-        val input = Patterns.NOT_NUMBER.matcher(editable!!).replaceAll("")
+        val input = clearPattern.matcher(editable!!).replaceAll("")
         val editableLength = input.length
 
         if (editableLength > 0) {
             run breaking@{
                 var editablePos = 0
                 watcherMask.forEach { c ->
-                    if (c != '#' && c != 'L') {
+                    if (c !in validMaskChars) {
                         builder.append(c)
                         if (!isPasting)
                             return@forEach
@@ -48,13 +52,13 @@ abstract class MaskedTextWatcher : android.text.TextWatcher {
 
                     val newChar = input[editablePos]
                     if (
-                        (newChar.isDigit() && c == '#') ||
-                        (newChar.isLetter() && c == 'L') ||
-                        (newChar.isLetterOrDigit() && c in validMaskChars)
+                        (newChar.isDigit() && c == DIGIT_MASK) ||
+                        (newChar.isLetter() && c == CHAR_MASK) ||
+                        (newChar.isLetterOrDigit() && c == DIGIT_CHAR_MASK)
                     ) {
                         builder.append(newChar)
                         editablePos++
-                    }
+                    } else return@breaking
                 }
             }
         }

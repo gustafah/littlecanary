@@ -6,7 +6,9 @@ object Patterns {
 
     //region Basic Patterns
     val NUMBER = "\\d*".toPattern()
-    val NOT_NUMBER = "\\D*".toPattern()
+    val NOT_DIGIT = "\\D*".toPattern()
+    val DIGIT_CHAR = "[\\dA-Z]*".toPattern()
+    val NOT_DIGIT_CHAR = "[^\\dA-Z]*".toPattern()
     //endregion
 
     //region Formats Patterns
@@ -18,6 +20,8 @@ object Patterns {
     private val CEP_UNFORMAT = "(\\d{5})(\\d{3})".toPattern()
     private val PHONE_FORMAT = "\\((\\d{2})\\)\\s(\\d{4,5})-(\\d{4})".toPattern()
     private val PHONE_UNFORMAT = "(\\d{2})(\\d{4,5})(\\d{4})".toPattern()
+    private val PLATE_FORMAT = "(\\w{3})-(\\d[\\w\\d]\\d{2})".toPattern()
+    private val PLATE_UNFORMAT = "(\\w{3})(\\d[\\w\\d]\\d{2})".toPattern()
 
     val CPF_PATTERN = FormatterPattern(
         formatPattern = CPF_FORMAT,
@@ -42,6 +46,12 @@ object Patterns {
         unformatPattern = PHONE_UNFORMAT,
         formatReplacement = "($1) $2-$3",
         unformatReplacement = "$1$2$3"
+    )
+    val PLATE_PATTERN = FormatterPattern(
+        formatPattern = PLATE_FORMAT,
+        unformatPattern = PLATE_UNFORMAT,
+        formatReplacement = "$1-$2",
+        unformatReplacement = "$1$2"
     )
     //endregion
 

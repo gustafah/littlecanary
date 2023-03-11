@@ -2,6 +2,7 @@ package com.gustafah.android.littlecanary.watcher
 
 import android.text.Editable
 import android.text.InputFilter
+import com.gustafah.android.littlecanary.common.Masks.CPF_MASK
 import com.gustafah.android.littlecanary.validator.CPFValidator
 import com.gustafah.android.littlecanary.validator.Validator
 
@@ -11,7 +12,7 @@ class CPFMaskedTextWatcher(override val validation: (Boolean) -> Unit) : MaskedT
         get() = CPFValidator
 
     override fun afterTextChanged(editable: Editable?) {
-        watcherMask = "###.###.###-##"
+        watcherMask = CPF_MASK
         editable!!.filters = arrayOf(InputFilter.LengthFilter(watcherMask.length))
         super.afterTextChanged(editable)
     }
