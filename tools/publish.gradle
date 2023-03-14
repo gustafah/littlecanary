@@ -1,0 +1,54 @@
+apply plugin: 'io.github.pedro-bachiega.sonatype-maven-publish'
+
+group = GROUP
+version = VERSION
+
+android {
+    task sourcesJar(type: Jar) {
+        from android.sourceSets.main.java.srcDirs
+        archiveClassifier.set("sources")
+    }
+
+    task javadoc(type: Javadoc) {
+        excludes = ['**/*.kt']
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        archiveClassifier.set("javadoc")
+        from javadoc.destinationDir
+    }
+
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+}
+
+sonatypePublishing {
+    repositoryUrl = REPO_URL
+    repositoryConnectionUrl = SCM_REPO_URL
+
+    licenseName = "The Apache License, Version 2.0" //Name of the license used by the project
+    licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt" //Url of the license used by the project
+
+    developerId = DEVELOPER_ID
+    developerName = DEVELOPER_NAME
+    developerEmail = DEVELOPER_EMAIL
+
+    username = OSSRH_USERNAME
+    password = OSSRH_PASSWORD
+}
+
+publications {
+    library {
+        artifactId = project.name
+        libName = LIB_NAME
+        libDescription = LIB_DESCRIPTION
+    }
+}
