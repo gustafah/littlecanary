@@ -37,12 +37,12 @@ sonatypePublishing {
     licenseName = "The Apache License, Version 2.0" //Name of the license used by the project
     licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt" //Url of the license used by the project
 
-    developerId = developerId
-    developerName = developerName
-    developerEmail = developerEmail
+    developerId = DEVELOPER_ID
+    developerName = DEVELOPER_NAME
+    developerEmail = DEVELOPER_EMAIL
 
-    username = ossrhUsername
-    password = ossrhPassword
+    username = OSSRH_USERNAME
+    password = OSSRH_PASSWORD
 }
 
 publications {
