@@ -1,6 +1,6 @@
 package com.gustafah.android.littlecanary.validator.rules
 
-import com.gustafah.android.littlecanary.common.aggregate
+import com.gustafah.android.littlecanary.common.ext.aggregate
 
 class ModRule(
     private val digits: Int,

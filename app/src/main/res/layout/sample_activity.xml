@@ -17,27 +17,35 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edt_cep"/>
+        app:layout_constraintTop_toBottomOf="@id/edt_cep" />
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/edt_cnpj"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edt_cpf"/>
+        app:layout_constraintTop_toBottomOf="@id/edt_cpf" />
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/edt_phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edt_cnpj"/>
+        app:layout_constraintTop_toBottomOf="@id/edt_cnpj" />
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/edt_plate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edt_phone"/>
+        app:layout_constraintTop_toBottomOf="@id/edt_phone" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_mask"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Masks"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edt_plate" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
