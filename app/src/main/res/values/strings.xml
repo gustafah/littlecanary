@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">LittleCanary</string>
+    <string name="add_masks_without_filler">Add Masks without filler</string>
+    <string name="add_masks_with_filler">Add Masks with filler</string>
 </resources>
