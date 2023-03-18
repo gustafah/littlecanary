@@ -2,7 +2,6 @@ package com.gustafah.android.littlecanary.watcher
 
 import android.graphics.Typeface
 import android.text.Editable
-import android.text.InputType
 import android.widget.EditText
 import com.gustafah.android.littlecanary.common.Masks.CHAR_MASK
 import com.gustafah.android.littlecanary.common.Masks.DIGIT_CHAR_MASK
@@ -19,21 +18,14 @@ abstract class MaskedTextWatcher : android.text.TextWatcher {
     private var isDeleting = false
     private var isPasting = false
     private var shouldChangeTextInput = true
-    private var shouldFillBlanks = true
     private var editText: EditText? = null
+    var shouldFillBlanks = true
+        private set
 
     abstract var clearPattern: Pattern
     abstract var watcherMask: String
     abstract val watcherValidation: Validator
     abstract val validation: (Boolean) -> Unit
-    private var inputTypeMap = mapOf(
-        Pair(DIGIT_MASK, InputType.TYPE_CLASS_PHONE),
-        Pair(CHAR_MASK, InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS),
-        Pair(
-            DIGIT_CHAR_MASK,
-            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-        )
-    )
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
         if (isUpdating) return
@@ -58,10 +50,8 @@ abstract class MaskedTextWatcher : android.text.TextWatcher {
                 watcherMask.forEach { c ->
                     val isLastInput = editablePos >= editableLength
                     if (c !in validMaskChars) {
-                        if (!isDeleting || !isLastInput)
-                            builder.append(c)
-                        if (!isPasting)
-                            return@forEach
+                        if (!isDeleting || !isLastInput) builder.append(c)
+                        if (!isPasting) return@forEach
                     }
                     if (!isLastInput && !invalidChar) {
                         val newChar = input[editablePos]
@@ -69,17 +59,13 @@ abstract class MaskedTextWatcher : android.text.TextWatcher {
                             builder.append(newChar)
                             editablePos++
                         } else {
-                            if (shouldFillBlanks)
-                                builder.append(fillerChar)
-                            else
-                                return@breaking
+                            if (shouldFillBlanks) builder.append(fillerChar)
+                            else return@breaking
                             invalidChar = true
                         }
                     } else {
-                        if (shouldFillBlanks)
-                            builder.append(fillerChar)
-                        else
-                            return@breaking
+                        if (shouldFillBlanks) builder.append(fillerChar)
+                        else return@breaking
                     }
                 }
             }
@@ -96,13 +82,13 @@ abstract class MaskedTextWatcher : android.text.TextWatcher {
         isUpdating = false
     }
 
-    internal fun bindEditText(edt: EditText) {
+    internal open fun bindEditText(edt: EditText) {
+        edt.typeface = Typeface.DEFAULT
         this.editText = edt
     }
 
     internal fun setShouldChangeTextInput(enable: Boolean) {
         this.shouldChangeTextInput = enable
-        changeTextInput()
     }
 
     internal fun setShouldFillBlanks(enable: Boolean) {
@@ -136,17 +122,21 @@ abstract class MaskedTextWatcher : android.text.TextWatcher {
                 (newChar.isLetterOrDigit() && maskChar == DIGIT_CHAR_MASK)
 
     private fun placeCursor(input: String) {
-        val placeCursorAt = getNextNonMaskPosition(input)
+        val placeCursorAt = if (shouldFillBlanks) getLastActualCharPosition(input)
+        else getNextNonMaskPosition(input)
         editText?.setSelection(placeCursorAt)
-        if (placeCursorAt < watcherMask.length)
-            applyTextInputToChar(watcherMask[placeCursorAt])
     }
 
     private fun getNextNonMaskPosition(input: String): Int {
-        if (input.isEmpty()) return 0
-        return input.length.let { inputLength ->
-            if (inputLength >= watcherMask.length) return@let inputLength
-            var cursorPos = inputLength
+        return if (!shouldFillBlanks) {
+            input
+        } else {
+            input.replace(fillerChar.toString(), "")
+        }.let {
+            if (it.isEmpty()) return@let 0
+
+            if (it.length >= watcherMask.length) return it.length
+            var cursorPos = it.length
             do {
                 val charAtPos = watcherMask[cursorPos]
                 cursorPos++
@@ -157,19 +147,4 @@ abstract class MaskedTextWatcher : android.text.TextWatcher {
         }
     }
 
-    private fun changeTextInput() {
-        if (shouldChangeTextInput) {
-            val cursorPos = getNextNonMaskPosition(editText?.text.toString())
-            val maskChar = watcherMask[cursorPos]
-            applyTextInputToChar(maskChar)
-        }
-    }
-
-    private fun applyTextInputToChar(maskChar: Char) {
-        editText?.inputType = if (shouldFillBlanks)
-            InputType.TYPE_CLASS_TEXT
-        else
-            inputTypeMap[maskChar] ?: InputType.TYPE_CLASS_TEXT
-        editText?.typeface = Typeface.DEFAULT
-    }
 }
